@@ -36,6 +36,15 @@ local mappings = {
   { from = '.', to = 'right', toMod = {'alt'} } -- go to end of word
 }
 
+local appMappings = {
+  ['Eclipse'] = {
+    { from = 'o', to = 'f6', toMod = {'cmd'} },
+    { from = 'i', to = 'f6', toMod = {'cmd', 'shift'} },
+    { from = 'r', to = 'r', toMod = {'cmd', 'alt'} },
+    { from = 'f', to = '1', toMod = {'cmd'} }
+  }
+}
+
 -- If KEY1 and KEY2 are *both* pressed within this time period, consider this to
 -- mean that they've been pressed simultaneously, and therefore we should enter
 -- smode.
@@ -107,15 +116,29 @@ local clearTable = function(table)
   end
 end
 
--- finds a mapping for the given key + modifiers if it exists
-local findMapping = function(key, modifiers)
+-- support function for findMapping
+local _findMapping = function(key, modifiers, keymap)
   local n = 0
-  for _,mapping in pairs(mappings) do
+  for _,mapping in pairs(keymap) do
     if mapping.from == key and (not mapping.fromMod or table_eq(mapping.fromMod, modifiers)) then
       return mapping
     end
   end
   return nil
+end
+
+-- finds a mapping for the given key + modifiers if it exists
+local findMapping = function(key, modifiers)
+  -- first, see if there are any app-specific mappings for the keystroke
+  local app = appMappings[hs.application.frontmostApplication():name()]
+  if app then
+    local mapping = _findMapping(key, modifiers, app)
+    if mapping then
+      return mapping
+    end
+  end
+  -- no app-specific mapping found, try the defaults
+  return _findMapping(key, modifiers, mappings)
 end
 
 local sendKeyDown = function(modifiers, key)
