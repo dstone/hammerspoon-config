@@ -21,14 +21,19 @@ Ad hoc testing guidelines:
 local KEY1 = hs.keycodes.map[1] -- the physical 's' key, independent of keyboard layout
 local KEY2 = hs.keycodes.map[2] -- the physical 's' key, independent of keyboard layout
 
+
 local mappings = {
   { from = 'h', to = 'left' },
-  { from = 'n', to = 'down' },
-  { from = 'e', to = 'up' },
-  { from = 'i', to = 'right' },
-  { from = 'd', to = 'delete', fromMod = {'shift'}, toMod = {'ctrl', 'shift'} },
-  -- must come after since it will pick up any modifier
-  { from = 'd', to = 'forwarddelete' }
+  { from = 'j', to = 'down' },
+  { from = 'k', to = 'up' },
+  { from = 'l', to = 'right' },
+
+  { from = 'i', to = '[', toMod = {'cmd', 'shift'} }, -- go to prev tab
+  { from = 'o', to = ']', toMod = {'cmd', 'shift'} }, -- go to next tab
+  { from = 'u', to = 'left', toMod = {'cmd'} }, -- go to start of line
+  { from = 'p', to = 'right', toMod = {'cmd'} }, -- go to end of line
+  { from = ',', to = 'left', toMod = {'alt'} }, -- go to start of word
+  { from = '.', to = 'right', toMod = {'alt'} } -- go to end of word
 }
 
 -- If KEY1 and KEY2 are *both* pressed within this time period, consider this to
