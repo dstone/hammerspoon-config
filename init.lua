@@ -30,10 +30,14 @@ local mappings = {
 
   { from = 'i', to = '[', toMod = {'cmd', 'shift'} }, -- go to prev tab
   { from = 'o', to = ']', toMod = {'cmd', 'shift'} }, -- go to next tab
+  { from = 'u', to = 'left', fromMod = { 'shift' }, toMod = {'cmd', 'shift'} }, -- select to start of line
+  { from = 'p', to = 'right', fromMod = { 'shift' }, toMod = {'cmd', 'shift'} }, -- select to end of line
   { from = 'u', to = 'left', toMod = {'cmd'} }, -- go to start of line
   { from = 'p', to = 'right', toMod = {'cmd'} }, -- go to end of line
   { from = ',', to = 'left', toMod = {'alt'} }, -- go to start of word
-  { from = '.', to = 'right', toMod = {'alt'} } -- go to end of word
+  { from = '.', to = 'right', toMod = {'alt'} }, -- go to end of word
+  { from = '<', to = 'left', toMod = {'alt', 'shift'} }, -- select to start of word
+  { from = '>', to = 'right', toMod = {'alt', 'shift'} } -- go to end of word
 }
 
 local appMappings = {
@@ -143,6 +147,10 @@ end
 
 local sendKeyDown = function(modifiers, key)
   hs.eventtap.event.newKeyEvent(modifiers, key, true):post()
+end
+
+local sendKeyUp = function(modifiers, key)
+  hs.eventtap.event.newKeyEvent(modifiers, key, false):post()
 end
 
 -- http://stackoverflow.com/questions/25922437/how-can-i-deep-compare-2-lua-tables-which-may-or-may-not-have-tables-as-keys
@@ -306,6 +314,18 @@ superDuperModeNavListener = hs.eventtap.new({ eventTypes.keyDown }, function(eve
   if mapping then
     -- if toMod is not specified, pass whatever modifiers are pressed
     sendKeyDown(mapping.toMod or keys(event:getFlags()), mapping.to)
+    return true
+  end
+end):start()
+
+superDuperModeNavKeyUpListener = hs.eventtap.new({ eventTypes.keyUp }, function( event ) 
+  if not active then
+    return false
+  end
+
+  local mapping = findMapping( event:getCharacters(true):lower(), keys(event:getFlags()))
+  if mapping then
+    sendKeyUp(mapping.toMod or keys(event:getFlags()), mapping.to)
     return true
   end
 end):start()
